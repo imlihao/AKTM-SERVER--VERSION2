@@ -47,6 +47,7 @@ public class invoice implements Serializable{
 	public void setInv_status(int inv_status) {
 		this.inv_status = inv_status;
 	}
+	
 	@Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -108,12 +109,15 @@ public class invoice implements Serializable{
 	public String getReceiver_addr() {
 		return receiver_addr;
 	}
+	
 	public void setReceiver_addr(String receiver_addr) {
 		this.receiver_addr = receiver_addr;
 	}
+	
 	public int getCost() {
 		return cost;
 	}
+	
 	public void setCost(int cost) {
 		this.cost = cost;
 	}
