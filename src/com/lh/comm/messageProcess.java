@@ -161,6 +161,7 @@ class CSloginMsg{
  * 登陆回复的消息，根据权限分配信息；
  */
 class SCupdateAll{
+	String itype=msgType.login;
 	public sysuser sysu;
 	public List<invoice> invs;
 	public List<sysuser> sysusers;
@@ -185,7 +186,7 @@ class sysOp{
 class odoOp{
 	String itype=msgType.odoOp;
 	int op;
-	List<odo> user;
+	List<odo> odos;
 }
 
 class tpsOp{
