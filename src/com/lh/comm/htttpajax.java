@@ -13,6 +13,8 @@ import org.apache.struts2.ServletActionContext;
 
 /**
  * Servlet implementation class htttpajax
+ * @author Administrator
+ * 所有的请求统一处理，信息交由客户端解析处理
  */
 @WebServlet("/htttpajax")
 public class htttpajax extends HttpServlet {
@@ -47,7 +49,10 @@ public class htttpajax extends HttpServlet {
 		if(msgBack==null){
 			return;
 		}
-		//TODO 消息处理
+		System.out.println("[AJAX SEND]:"+msgBack);
+		//返回JSON 数据
+		response.setCharacterEncoding("utf-8");
+		response.getWriter();
 		response.getWriter().write(msgBack);
 		response.getWriter().flush();
 	}

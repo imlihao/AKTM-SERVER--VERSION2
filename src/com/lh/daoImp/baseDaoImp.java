@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 
 import com.lh.dao.baseDao;
@@ -40,7 +41,8 @@ public class baseDaoImp<E extends Serializable,PK extends Serializable> implemen
 
 	@Override
 	public E search(PK id) {
-		return session.load(entityClass,id);
+		//≤ª  ”√—”≥Ÿº”‘ÿ
+		return session.get(entityClass,id);
 	}
 
 	@Override
