@@ -5,7 +5,10 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
 import org.hibernate.annotations.GenericGenerator;
+
+import com.lh.define.common_status;
 
 @Entity
 public class invoice implements Serializable{
@@ -29,10 +32,13 @@ public class invoice implements Serializable{
     String receiver_phone;
     String receiver_addr;
     
-    //花费
+    //操作员ID 外键
+    long opid;
+   
+	//花费
     int cost;
     
-    int co_status;
+    int co_status=common_status.NORMAL;
     int inv_status;
     
     public int getCo_status() {
@@ -129,4 +135,11 @@ public class invoice implements Serializable{
 			this.good_identifier = good_identifier;
 		}
     
+    
+    public long getOpid() {
+		return opid;
+	}
+	public void setOpid(long opid) {
+		this.opid = opid;
+	}
 }

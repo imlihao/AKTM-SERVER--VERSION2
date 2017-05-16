@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import com.lh.define.common_status;
 /**
  * 
  * @author Administrator
@@ -21,7 +23,7 @@ public class loaddo implements Serializable{
    private long UTCTimeStamp;
    
    private int loaddo_status;
-   private int co_status;
+   private int co_status=common_status.NORMAL;
    
 @Id   
 public String getLoaddo_id() {

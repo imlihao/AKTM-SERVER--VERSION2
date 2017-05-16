@@ -3,8 +3,6 @@ package com.lh.vo;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 /**
  * 
@@ -16,8 +14,8 @@ public class sysuser implements Serializable{
 
 	private static final long serialVersionUID = 7914000255112201353L;
     
-	private int user_id;
-	private long phone;
+	private long user_id;
+	private String phone;
 	
 	private int roletype;
 	private String psd;
@@ -25,23 +23,25 @@ public class sysuser implements Serializable{
 	
 	private String autoid;
 	
-	private boolean power_odo; 
-	private boolean power_loaddo; 
-	private boolean power_user; 
-	private boolean power_dispitch;
+	
+	private boolean power_inv=false;
+	private boolean power_odo=false; 
+	private boolean power_loaddo=false; 
+	private boolean power_user=false; 
+	private boolean power_dispitch=false;
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	public int getUser_id() {
+	public long getUser_id() {
 		return user_id;
 	}
-	public void setUser_id(int user_id) {
+	public void setUser_id(long user_id) {
 		this.user_id = user_id;
 	}
-	public long getPhone() {
+
+	public String getPhone() {
 		return phone;
 	}
-	public void setPhone(long phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 	public int getRoletype() {
@@ -93,5 +93,18 @@ public class sysuser implements Serializable{
 		this.power_dispitch = power_dispitch;
 	}
 	
+	/**
+	 * 订单权限
+	 */
+	public boolean isPower_inv() {
+		return power_inv;
+	}
+	/**
+	 * 订单权限
+	 * @param power_inv
+	 */
+	public void setPower_inv(boolean power_inv) {
+		this.power_inv = power_inv;
+	}
 	
 }

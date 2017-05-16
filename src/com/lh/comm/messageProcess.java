@@ -3,9 +3,6 @@ package com.lh.comm;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.junit.Test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -15,9 +12,11 @@ import com.lh.dao.dao_loaddo;
 import com.lh.dao.dao_odo;
 import com.lh.dao.dao_sysuser;
 import com.lh.dao.dao_transport;
-import com.lh.daoImp.InvoiceDaoImp;
 import com.lh.daoImp.daoFactory;
+import com.lh.define.common_status;
+import com.lh.define.inv_status;
 import com.lh.define.msgType;
+import com.lh.define.operator;
 import com.lh.vo.customer;
 import com.lh.vo.invoice;
 import com.lh.vo.loaddo;
@@ -53,6 +52,7 @@ public class messageProcess {
     * @return 消息服务
     */
    public static messageProcess getMsp(int key){
+	   System.out.println("SESSION　HASHCODE　"+key);
 	   messageProcess msp=msps.get(key);
 	   if(msp==null){
 		   msp=new messageProcess();
@@ -74,8 +74,29 @@ public class messageProcess {
 	   }else if(sys==null){
 		   return null;
 	   }
-      	   
-	   switch(itype){       	   
+       System.out.println("[USER:"+sys.getName()+"]:"+itype);   
+	   switch(itype){ 
+	      case msgType.SCupdateAll:
+	    	  json=SCupdateAll();
+	    	  break;
+	      case msgType.cusOp:
+	    	  json=cusOp(jsonData);
+	    	  break;
+	      case msgType.invOp:
+	    	  json=invOp(jsonData);
+	    	  break;
+	      case msgType.lodOp:
+	    	  json=lodOp(jsonData);
+	    	  break;
+	      case msgType.odoOp:
+	    	  json=odoOp(jsonData);
+	    	  break;
+	      case msgType.sysOp:
+	    	  json=sysOp(jsonData);
+	    	  break;
+	      case msgType.tpsOp:
+	    	  json=tpsOp(jsonData);
+	    	  break;
 	      default:
 	    	  json=onError(itype);
 	    	  break;
@@ -110,12 +131,18 @@ public class messageProcess {
 		  };
 		  sys=us;
 		  //回信
-		  SCupdateAll scmsg=new SCupdateAll();
-		  
-		  scmsg.sysu=us;
-		  
-		  
-		  //TODO　根据权限分配
+		  CSloginMsg scmsg=new CSloginMsg();
+		  return gs.toJson(scmsg);
+	  }  
+      
+      /**
+       *请求所有数据
+       */
+      public String SCupdateAll(){
+    	  //TODO　根据权限分配
+    	  //回信
+		  SCupdateAll scmsg=new SCupdateAll();	  
+		  scmsg.sysu=this.sys;
 		  dao_invoice invd=daoFactory.getInvoiceDao();
 		  scmsg.invs=invd.searchAll();
 		  invd.commit();
@@ -142,10 +169,194 @@ public class messageProcess {
 		  
 		  String dat=gs.toJson(scmsg);
 		  return dat;
-	  }  
-   
+    	  
+      }
+      /**
+       * 订单操作
+       * @param json
+       * @return null
+       */
+      private String invOp(String json){
+    	  if(!sys.isPower_inv())return null;
+    	  invOp invop=gs.fromJson(json, invOp.class);
+    	  dao_invoice invdao=daoFactory.getInvoiceDao();
+    	  //增加
+    	  if(invop.op==operator.add){
+    	     for(invoice inv:invop.invs){
+    	         inv.setUTCTimeStamp(System.currentTimeMillis());
+    	         inv.setOpid(sys.getUser_id());
+    	         inv.setInv_status(inv_status.chuku);
+    	    	 invdao.save(inv);
+    	     }  
+    	  }else if(invop.op==operator.del){
+    		  for(invoice inv:invop.invs){//软删除
+    			 invoice orm=invdao.search(inv.getINV_ID());
+     	    	 if(orm!=null){
+     	    		orm.setCo_status(common_status.DELETE);
+     	    	 }
+     	    	 
+     	     } 
+    	  }else if(invop.op==operator.update){
+    		  for(invoice inv:invop.invs){
+    			 invoice orm=invdao.search(inv.getINV_ID());
+      	    	 if(orm!=null){
+                    invdao.update(orm);
+      	    	 } 
+      	    	 
+      	      } 
+     	  }
+    	  invdao.commit();
+          //TODO 全体更新    	  
+    	  return null;
+      }
+      
+       /**
+        * 系统用户
+        * @param json
+        * @return
+        */
+      private String sysOp(String json){
+    	  if(!sys.isPower_inv())return null;
+    	  sysOp sysOp=gs.fromJson(json, sysOp.class);
+    	  dao_sysuser sysdao=daoFactory.getSysuserDao();
+    	  //增加
+    	  if(sysOp.op==operator.add){
+    	     for(sysuser sys:sysOp.user){
+    	   
+    	         if(sysdao.search(sys.getUser_id())==null){
+    	    	  sysdao.save(sys);
+    	    	 }
+    	     }  
+    	  }else if(sysOp.op==operator.del){
+    		  for(sysuser sys:sysOp.user){//软删除
+    			 sysuser orm=sysdao.search(sys.getUser_id());
+     	    	 if(orm!=null){
+     	    		//TODO 删除
+     	    	 }
+     	    	 
+     	     } 
+    	  }else if(sysOp.op==operator.update){
+    		  for(sysuser sys:sysOp.user){
+    			 sysuser orm=sysdao.search(sys.getUser_id());
+      	    	 if(orm!=null){
+                    sysdao.update(orm);
+      	    	 } 
+      	    	 
+      	      } 
+     	  }
+    	  sysdao.commit();
+          //TODO 全体更新    	  
+    	  return null;
+      }
+      
+      /**
+       * 出库单操作
+       * @param json
+       * @return
+       */
+      private String  odoOp(String json){
+    	  odoOp odop=gs.fromJson(json, odoOp.class);
+    	  dao_odo odoDao=daoFactory.getodoDao();
+    	  if(odop.op==operator.add){
+    		  for(odo od:odop.odos){
+    			  odoDao.save(od);    			  
+    		  }
+    	  }else if(odop.op==operator.del){
+    		  
+        	  for(odo od:odop.odos){
+        			  odoDao.search(od.getOdo_id());
+        			  od.setCo_status(common_status.DELETE);        			
+        	   }  
+    		  
+    	  }else if(odop.op==operator.update){
+    		  
+        		  for(odo od:odop.odos){
+        			         			
+        	      }  
+    		  
+    	  }	
+    	  odoDao.commit();
+    	  //TODO 全体更新
+    	  return null;
+      }
+      
+      private String tpsOp(String json){
+    	tpsOp tpsop=gs.fromJson(json, tpsOp.class);
+    	
+    	dao_transport tpsDao=daoFactory.gettransportDao();
+    	if(tpsop.op==operator.add){
+    		for(transport tps:tpsop.tps){
+    		   tps.setUTCTimeStamp(System.currentTimeMillis());
+    		   tpsDao.save(tps);
+    		}
+    	}else  if(tpsop.op==operator.del){
+    		for(transport tps:tpsop.tps){
+     		   transport obj=tpsDao.search(tps.getTransport_id());
+     		   obj.setCo_status(common_status.DELETE);
+     		}
+     	}else  if(tpsop.op==operator.update){
+    		for(transport tps:tpsop.tps){
+      		   tpsDao.update(tps);
+      		}
+      	}
+    	
+        tpsDao.commit();
+        //TODO 
+		return null;   	  
+      }
+      
+      private String cusOp(String json){
+    	cusOp cop=gs.fromJson(json,cusOp.class); 
+    	dao_customer cusDao=daoFactory.getCustomerDao();
+    	
+    	if(cop.op==operator.add){
+    		for(customer cus:cop.cus){
+    			cusDao.save(cus);
+    		}   		
+    	}else  if(cop.op==operator.del){
+    		for(customer cus:cop.cus){
+    			customer obj=cusDao.search(cus.getCus_id());
+    			if(obj!=null){
+    				obj.setCo_status(common_status.DELETE);
+    			}
+    		}   		
+    	}else if(cop.op==operator.update){
+    		for(customer cus:cop.cus){
+    			cusDao.update(cus);
+    		}   		
+    	}
+    	cusDao.commit();
+		return null;
+    	  
+      }
+      
+      private String lodOp(String json){
+    	  dao_loaddo loadDao=daoFactory.getloaddoDao();
+    	  lodOp lodop=gs.fromJson(json, lodOp.class);
+    	  if(lodop.op==operator.add){
+    		  for(loaddo ldo:lodop.lds){
+    			  ldo.setUTCTimeStamp(System.currentTimeMillis());
+    			  loadDao.save(ldo);
+    		  }
+    	  }else if(lodop.op==operator.del){
+    		  for(loaddo ldo:lodop.lds){
+    			  loaddo obj=loadDao.search(ldo.getLoaddo_id());
+    			  if(obj!=null){
+    				  obj.setCo_status(common_status.DELETE);
+    			  }
+    		  }
+    	  }else if(lodop.op==operator.update){
+    		  for(loaddo ldo:lodop.lds){
+    			  loadDao.update(ldo);
+    		  }
+    	  }
+        loadDao.commit();    	  
+		return null;   	  
+      }
    }
-   
+
+
+
 
 /**
  * 
@@ -153,7 +364,8 @@ public class messageProcess {
  * 登陆消息
  */
 class CSloginMsg{
-	public int name;
+	String itype=msgType.login;
+	public long name;
 	public String psd;
 }
 
@@ -161,7 +373,7 @@ class CSloginMsg{
  * 登陆回复的消息，根据权限分配信息；
  */
 class SCupdateAll{
-	String itype=msgType.login;
+	String itype=msgType.SCupdateAll;
 	public sysuser sysu;
 	public List<invoice> invs;
 	public List<sysuser> sysusers;

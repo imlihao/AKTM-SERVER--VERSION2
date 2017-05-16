@@ -39,6 +39,7 @@ public class websocket{
      */
     @OnMessage
     public void onMessage(String message, Session session){
+    	System.out.println("[session ws id]:"+this.httpsession.getId());
     	  System.out.println("[server rec]:"+message);
     	  //TODO 消息处理
     }

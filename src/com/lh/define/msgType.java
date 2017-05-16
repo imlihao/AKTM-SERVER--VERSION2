@@ -2,7 +2,9 @@ package com.lh.define;
 
 public class msgType {
   public static final String login="login";
-  public static final String logout="logout";
+  public static final String logout="logout"; 
+  
+  public static final String SCupdateAll="SCupdateAll";
   
   public static final String alret="alret";
   

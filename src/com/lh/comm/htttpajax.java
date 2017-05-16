@@ -43,12 +43,14 @@ public class htttpajax extends HttpServlet {
 		System.out.println( request.getParameter("itype"));
 		System.out.println( request.getParameter("data"));
 		response.setHeader("Access-Control-Allow-Origin", "*");
-		
+		//response.setHeader("Access-Control-Allow-Credentials", "true");
+		System.out.println("[session id]:"+request.getSession().getId());
 		String msgBack=messageProcess.getMsp(request.getSession().hashCode()).process(request.getParameter("itype"),  request.getParameter("data"));
 		
 		if(msgBack==null){
 			return;
 		}
+		
 		System.out.println("[AJAX SEND]:"+msgBack);
 		//·µ»ØJSON Êý¾Ý
 		response.setCharacterEncoding("utf-8");
