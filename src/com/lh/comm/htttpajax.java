@@ -45,7 +45,8 @@ public class htttpajax extends HttpServlet {
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		//response.setHeader("Access-Control-Allow-Credentials", "true");
 		System.out.println("[session id]:"+request.getSession().getId());
-		String msgBack=messageProcess.getMsp(request.getSession().hashCode()).process(request.getParameter("itype"),  request.getParameter("data"));
+		//TODO  更换获取服务方式
+		String msgBack=messageProcess.getMsp(request.getSession().getId()).process(request.getParameter("itype"),  request.getParameter("data"));
 		
 		if(msgBack==null){
 			return;

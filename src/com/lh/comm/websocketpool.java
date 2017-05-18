@@ -1,6 +1,7 @@
 package com.lh.comm;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class websocketpool {
@@ -20,8 +21,15 @@ public class websocketpool {
 	  return pool.size();
   }
   
-  public static void sendAll(){
-	  //TODO 
-	  
+  
+  /**
+   * 
+   * @param json
+   */
+  public static void sendAllexcpMe(String json){  //TODO 现在仍包括自己	  
+	 Iterator<websocket> it= pool.iterator();
+	 while(it.hasNext()){
+		 it.next().sendMessage(json);
+	 }
   }
 }

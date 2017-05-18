@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import com.lh.define.common_status;
 /**
  * 
  * @author Administrator
@@ -25,7 +27,7 @@ public class odo  implements Serializable{
     long UTCtimeStamp;
     
     int odo_status;
-	int co_status;
+	int co_status=common_status.NORMAL;
 	
 	@Id
 	public String getOdo_id() {

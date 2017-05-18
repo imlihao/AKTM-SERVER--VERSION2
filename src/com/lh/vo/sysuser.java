@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import com.lh.define.common_status;
 /**
  * 
  * @author Administrator
@@ -24,6 +26,8 @@ public class sysuser implements Serializable{
 	private String autoid;
 	
 	
+	private int co_status=common_status.NORMAL;
+	
 	private boolean power_inv=false;
 	private boolean power_odo=false; 
 	private boolean power_loaddo=false; 
@@ -38,6 +42,12 @@ public class sysuser implements Serializable{
 		this.user_id = user_id;
 	}
 
+	public int getCo_status() {
+		return co_status;
+	}
+	public void setCo_status(int co_status) {
+		this.co_status = co_status;
+	}
 	public String getPhone() {
 		return phone;
 	}

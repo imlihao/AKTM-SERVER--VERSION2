@@ -8,9 +8,12 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 import com.lh.dao.baseDao;
 import com.lh.dbc.hibernateFactory;
+import com.lh.define.common_status;
+import com.lh.vo.customer;
 
 public class baseDaoImp<E extends Serializable,PK extends Serializable> implements baseDao<E, PK>{    
 	private Class<E> entityClass;
@@ -36,6 +39,7 @@ public class baseDaoImp<E extends Serializable,PK extends Serializable> implemen
 	public List<E> searchAll() {
 		session.toString(); 		
 		Criteria c=session.createCriteria(entityClass);
+		c.add(Restrictions.eq("co_status", common_status.NORMAL));
 		return c.list();
 	}
 

@@ -7,6 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.lh.define.common_status;
+
 /**
  * 
  * @author Administrator
@@ -25,7 +27,7 @@ public class customer implements Serializable {
 	String company;
 	String addr;
 	// ±êÖ¾Î»
-	int co_status;
+	int co_status=common_status.NORMAL;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

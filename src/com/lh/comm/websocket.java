@@ -10,6 +10,9 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 /**
  * @author Administrator
  *
@@ -19,6 +22,9 @@ public class websocket{
 	private Session session;
 	private HttpSession httpsession;
 	
+	public String getsessionid() {
+		return httpsession.getId();
+	}
     @OnOpen
 	public void onOpen(Session session,EndpointConfig ec){ 	
        	this.session=session;
@@ -29,8 +35,8 @@ public class websocket{
     @OnClose
     public void onClose(){
     	websocketpool.delsocket(this);
-  	    //注销服务
-  	    messageProcess.cancelMsp(httpsession.hashCode());
+  	    //TODO 注销服务,坚挺session
+  	   // messageProcess.cancelMsp(httpsession.getId());
     }
     
     /**
@@ -38,12 +44,16 @@ public class websocket{
      * @param session  可选
      */
     @OnMessage
-    public void onMessage(String message, Session session){
-    	System.out.println("[session ws id]:"+this.httpsession.getId());
-    	  System.out.println("[server rec]:"+message);
-    	  //TODO 消息处理
+    public void onMessage(String message){
+    	//System.out.println("[session ws id]:"+this.httpsession.getId());
+    	System.out.println("[ws rec]:"+message);
+        msgBase mb=gs.fromJson(message, msgBase.class);
+    	String returnMsg=messageProcess.getMsp(this.httpsession.getId()).process(mb.itype, mb.data);
+    	if(returnMsg!=null){
+    		this.sendMessage(returnMsg);
+    	}
     }
-     
+    private Gson gs=new GsonBuilder().create();
     
     /**
      * 发生错误时调用
@@ -70,3 +80,9 @@ public class websocket{
 	}
 	 
 }
+
+class msgBase{
+  String itype;
+  String data;	
+}
+

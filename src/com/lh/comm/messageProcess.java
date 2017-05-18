@@ -31,18 +31,19 @@ import com.lh.vo.transport;
 public class messageProcess {
 	
    
-   private static Map<Integer, messageProcess> msps=new HashMap<Integer, messageProcess>();
+   private static Map<String, messageProcess> msps=new HashMap<String, messageProcess>();
    
    Gson gs=new GsonBuilder().create();
    //验证人物
    private sysuser sys;
    
    
+   
    /**
     * 注销服务
     * @param key session标示符
     */
-   public static void cancelMsp(int key){
+   public static void cancelMsp(String key){
 	   msps.remove(key);
    }
    
@@ -51,8 +52,7 @@ public class messageProcess {
     * @param key 获取session对应的服务
     * @return 消息服务
     */
-   public static messageProcess getMsp(int key){
-	   System.out.println("SESSION　HASHCODE　"+key);
+   public static messageProcess getMsp(String key){
 	   messageProcess msp=msps.get(key);
 	   if(msp==null){
 		   msp=new messageProcess();
@@ -70,9 +70,12 @@ public class messageProcess {
    public String process(String itype,String jsonData){
 	   String json=null;
 	   if(itype.equals(msgType.login)){
+		   
 		   return login(jsonData);
 	   }else if(sys==null){
-		   return null;
+		   //TODO  跳转到登陆界面
+		   System.out.println("未登录非法消息");
+		   return logout();
 	   }
        System.out.println("[USER:"+sys.getName()+"]:"+itype);   
 	   switch(itype){ 
@@ -114,6 +117,13 @@ public class messageProcess {
 	   return gs.toJson(scmsg);
    }
    
+   /**
+    * 
+    * @return logoutmsg
+    */
+   public String logout(){
+	   return gs.toJson(new logout());
+   }
    
    /**
     *  登陆处理
@@ -130,6 +140,7 @@ public class messageProcess {
 			  return gs.toJson(al);			  
 		  };
 		  sys=us;
+		  System.out.println(sys.getName());
 		  //回信
 		  CSloginMsg scmsg=new CSloginMsg();
 		  return gs.toJson(scmsg);
@@ -171,6 +182,11 @@ public class messageProcess {
 		  return dat;
     	  
       }
+      
+      private void datarefreshall(){
+    	  websocketpool.sendAllexcpMe(SCupdateAll());    	  
+      }
+      
       /**
        * 订单操作
        * @param json
@@ -206,7 +222,7 @@ public class messageProcess {
       	      } 
      	  }
     	  invdao.commit();
-          //TODO 全体更新    	  
+    	  datarefreshall();	  
     	  return null;
       }
       
@@ -231,7 +247,7 @@ public class messageProcess {
     		  for(sysuser sys:sysOp.user){//软删除
     			 sysuser orm=sysdao.search(sys.getUser_id());
      	    	 if(orm!=null){
-     	    		//TODO 删除
+     	    		  datarefreshall();	
      	    	 }
      	    	 
      	     } 
@@ -245,7 +261,7 @@ public class messageProcess {
       	      } 
      	  }
     	  sysdao.commit();
-          //TODO 全体更新    	  
+    	  datarefreshall();		  
     	  return null;
       }
       
@@ -271,12 +287,12 @@ public class messageProcess {
     	  }else if(odop.op==operator.update){
     		  
         		  for(odo od:odop.odos){
-        			         			
+        			  odoDao.update(od);       			
         	      }  
     		  
     	  }	
     	  odoDao.commit();
-    	  //TODO 全体更新
+    	  datarefreshall();	
     	  return null;
       }
       
@@ -301,7 +317,7 @@ public class messageProcess {
       	}
     	
         tpsDao.commit();
-        //TODO 
+        datarefreshall();	
 		return null;   	  
       }
       
@@ -316,7 +332,9 @@ public class messageProcess {
     	}else  if(cop.op==operator.del){
     		for(customer cus:cop.cus){
     			customer obj=cusDao.search(cus.getCus_id());
+    			System.out.print(obj+""+cus.getCus_id());
     			if(obj!=null){
+    				System.out.print("@@");
     				obj.setCo_status(common_status.DELETE);
     			}
     		}   		
@@ -326,6 +344,7 @@ public class messageProcess {
     		}   		
     	}
     	cusDao.commit();
+    	  datarefreshall();	
 		return null;
     	  
       }
@@ -350,7 +369,8 @@ public class messageProcess {
     			  loadDao.update(ldo);
     		  }
     	  }
-        loadDao.commit();    	  
+        loadDao.commit();  
+        datarefreshall();	
 		return null;   	  
       }
    }
@@ -369,6 +389,15 @@ class CSloginMsg{
 	public String psd;
 }
 
+
+/**
+ * 
+ * @author Administrator
+ * 登出消息
+ */
+class logout{
+	String itype=msgType.logout;
+}
 /**
  * 登陆回复的消息，根据权限分配信息；
  */
