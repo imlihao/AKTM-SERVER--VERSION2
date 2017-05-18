@@ -340,7 +340,10 @@ public class messageProcess {
     		}   		
     	}else if(cop.op==operator.update){
     		for(customer cus:cop.cus){
+    			customer cu=new customer();
     			cusDao.update(cus);
+    			
+ 
     		}   		
     	}
     	cusDao.commit();

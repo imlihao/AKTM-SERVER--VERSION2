@@ -16,7 +16,7 @@ public class testdatainsert {
     	op2.setUser_id(2013020102);
     	op2.setName("仓库管理员1");
     	op2.setPhone("13619155070");
-    	op2.setRoletype(roletype.diver);
+    	op2.setRoletype(roletype.operator_Warehouse);
     	
     	op2.setPower_inv(true);
     	op2.setPower_user(true);
@@ -50,7 +50,7 @@ public class testdatainsert {
     	op.setUser_id(2013020101);
     	op.setName("订单管理员1");
     	op.setPhone("13619155070");
-    	op.setRoletype(roletype.diver);
+    	op.setRoletype(roletype.operator_normal);
     	
     	op.setPower_inv(true);
     	op.setPower_user(true);
