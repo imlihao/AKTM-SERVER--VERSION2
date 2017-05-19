@@ -23,7 +23,7 @@ public class odo  implements Serializable{
 //    int good_identifier;
     
     //²Ù×÷Ô±
-    int operator_id;
+	long operator_id;
     long UTCtimeStamp;
     
     int odo_status;
@@ -37,10 +37,10 @@ public class odo  implements Serializable{
 		this.odo_id = odo_id;
 	}
 
-	public int getOperator_id() {
+	public long getOperator_id() {
 		return operator_id;
 	}
-	public void setOperator_id(int operator_id) {
+	public void setOperator_id(long operator_id) {
 		this.operator_id = operator_id;
 	}
 	public long getUTCtimeStamp() {

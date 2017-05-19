@@ -15,5 +15,5 @@ public class msgType {
   public static final String sysOp="sysOp";
   public static final String invOp="invOp";
   
-  
+  public static final String invcreate="invcreate";
 }

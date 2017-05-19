@@ -17,7 +17,7 @@ public class loaddo implements Serializable{
    private static final long serialVersionUID = 5931619466996163481L;
    
    private String loaddo_id;
-   private int diver_id;
+   private long diver_id;
    
    private String autoid;
    private long UTCTimeStamp;
@@ -32,10 +32,10 @@ public String getLoaddo_id() {
 public void setLoaddo_id(String loaddo_id) {
 	this.loaddo_id = loaddo_id;
 }
-public int getDiver_id() {
+public long getDiver_id() {
 	return diver_id;
 }
-public void setDiver_id(int diver_id) {
+public void setDiver_id(long diver_id) {
 	this.diver_id = diver_id;
 }
 public String getAutoid() {

@@ -54,9 +54,12 @@ public class invoice implements Serializable{
 		this.inv_status = inv_status;
 	}
 	
+	/**
+	 * @GeneratedValue(generator = "uuid")
+     * @GenericGenerator(name = "uuid", strategy = "uuid")
+	 * */
+	
 	@Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
 	public String  getINV_ID() {
 		return INV_ID;
 	}

@@ -3,6 +3,7 @@ package com.lh.comm;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,6 +18,7 @@ import com.lh.define.common_status;
 import com.lh.define.inv_status;
 import com.lh.define.msgType;
 import com.lh.define.operator;
+import com.lh.define.order_status;
 import com.lh.vo.customer;
 import com.lh.vo.invoice;
 import com.lh.vo.loaddo;
@@ -99,6 +101,9 @@ public class messageProcess {
 	    	  break;
 	      case msgType.tpsOp:
 	    	  json=tpsOp(jsonData);
+	    	  break;
+	      case msgType.invcreate:
+	    	  json=invcreate(jsonData);
 	    	  break;
 	      default:
 	    	  json=onError(itype);
@@ -376,6 +381,53 @@ public class messageProcess {
         datarefreshall();	
 		return null;   	  
       }
+      
+      public String invcreate(String json){
+    	invcreate inc=gs.fromJson(json, invcreate.class); 
+    	//订单创建
+    	dao_invoice invDao=daoFactory.getInvoiceDao();
+    	invoice inv=inc.inv;
+    	String uuid=UUID.randomUUID().toString();
+    	inv.setINV_ID(uuid);
+    	inv.setInv_status(inv_status.chuku);
+    	invDao.save(inv);
+    	invDao.commit();
+    	
+    	//创建出库单
+    	dao_odo odoDao=daoFactory.getodoDao();
+    	odo od=new odo();
+    	od.setOdo_id(uuid);
+    	od.setOperator_id(inc.wopid);
+    	od.setOdo_status(order_status.ONGOING);
+    	od.setUTCtimeStamp(System.currentTimeMillis());
+        odoDao.save(od);   
+    	odoDao.commit();
+        
+        //创建loaddo
+        dao_loaddo loadDao=daoFactory.getloaddoDao();
+        loaddo ldo=new loaddo();
+        ldo.setLoaddo_id(uuid);
+        ldo.setDiver_id(inc.driverid);
+        ldo.setAutoid(inc.autoid);
+        ldo.setLoaddo_status(order_status.NOT_START);
+        loadDao.save(ldo);
+        loadDao.commit();
+        
+        //创建配送单
+        dao_transport tpsDao=daoFactory.gettransportDao();
+        transport tps=new transport();
+        tps.setTransport_id(uuid);
+        tps.setAuto_id(inc.autoid);
+        tps.setDiver_id(inc.driverid);
+    	tps.setDiver_name(inc.drivername);
+    	tps.setUTCTimeStamp(System.currentTimeMillis());
+    	tps.setTransport_status(order_status.NOT_START);
+    	tpsDao.save(tps);
+    	tpsDao.commit();
+    	
+    	datarefreshall();
+    	return null;    	  
+      }
    }
 
 
@@ -454,6 +506,16 @@ class lodOp{
 class alret{
     String itype=msgType.alret;
 	String msg; 
+}
+
+
+class invcreate{
+	String itype=msgType.invcreate;
+	invoice inv;
+    long driverid; 
+	long wopid;
+	String autoid;
+	String drivername;
 }
 
 
