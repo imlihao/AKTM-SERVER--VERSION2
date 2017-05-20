@@ -105,12 +105,54 @@ public class messageProcess {
 	      case msgType.invcreate:
 	    	  json=invcreate(jsonData);
 	    	  break;
+	      case msgType.markitsolve:
+	    	  json=markitsolve(jsonData);
+	    	  break;
 	      default:
 	    	  json=onError(itype);
 	    	  break;
 	   }
 	   return json;
    } 
+   
+   public String markitsolve(String json){
+	  markitsolve mks=gs.fromJson(json, markitsolve.class);
+	  if(mks.type==1){//odo
+		dao_odo od=daoFactory.getodoDao();
+		od.search(mks.pk).setOdo_status(order_status.FINISH);
+		od.commit();
+		
+		dao_loaddo od2=daoFactory.getloaddoDao();
+		od2.search(mks.pk).setLoaddo_status(order_status.ONGOING);
+		od2.commit();
+		
+		dao_invoice indo=daoFactory.getInvoiceDao();
+		indo.search(mks.pk).setInv_status(inv_status.zhuangche);
+		indo.commit();
+	  }else if(mks.type==3){//loaddo
+			dao_loaddo od=daoFactory.getloaddoDao();
+			od.search(mks.pk).setLoaddo_status(order_status.FINISH);
+			od.commit();
+			
+			dao_transport od2=daoFactory.gettransportDao();
+			od2.search(mks.pk).setTransport_status(order_status.ONGOING);
+			od2.commit();
+			
+			dao_invoice indo=daoFactory.getInvoiceDao();
+			indo.search(mks.pk).setInv_status(inv_status.peisong);
+			indo.commit();
+	  }else if(mks.type==2){//tps
+			dao_transport od=daoFactory.gettransportDao();
+			od.search(mks.pk).setTransport_status(order_status.FINISH);
+			od.commit();	
+			
+			dao_invoice indo=daoFactory.getInvoiceDao();
+			indo.search(mks.pk).setInv_status(inv_status.finish);	
+			indo.commit();
+	  }
+	  datarefreshall();	  
+	  return null;
+   }
    
    /**
     * ¥ÌŒÛ¥¶¿Ì
@@ -215,6 +257,21 @@ public class messageProcess {
      	    	 if(orm!=null){
      	    		orm.setCo_status(common_status.DELETE);
      	    	 }
+     	    	 
+     	    	 
+     	    	 dao_odo ododao=daoFactory.getodoDao();
+     	    	 ododao.search(inv.getINV_ID()).setCo_status(common_status.DELETE);
+     	    	 ododao.commit();
+     	    	 
+     	   	     dao_transport dao2=daoFactory.gettransportDao();
+     	    	 dao2.search(inv.getINV_ID()).setCo_status(common_status.DELETE);
+     	         dao2.commit();
+     	         
+
+     	   	     dao_loaddo dao3=daoFactory.getloaddoDao();
+     	     	 dao3.search(inv.getINV_ID()).setCo_status(common_status.DELETE);
+     	    	 dao3.commit();
+     	    	 
      	    	 
      	     } 
     	  }else if(invop.op==operator.update){
@@ -516,6 +573,12 @@ class invcreate{
 	long wopid;
 	String autoid;
 	String drivername;
+}
+
+class markitsolve{
+	String pk;
+	int type;
+	String itype=msgType.markitsolve;
 }
 
 
