@@ -294,7 +294,6 @@ public class messageProcess {
         * @return
         */
       private String sysOp(String json){
-    	  if(!sys.isPower_inv())return null;
     	  sysOp sysOp=gs.fromJson(json, sysOp.class);
     	  dao_sysuser sysdao=daoFactory.getSysuserDao();
     	  //Ôö¼Ó
@@ -309,16 +308,13 @@ public class messageProcess {
     		  for(sysuser sys:sysOp.user){//ÈíÉ¾³ý
     			 sysuser orm=sysdao.search(sys.getUser_id());
      	    	 if(orm!=null){
-     	    		  datarefreshall();	
+     	    		orm.setCo_status(common_status.DELETE);
      	    	 }
      	    	 
      	     } 
     	  }else if(sysOp.op==operator.update){
     		  for(sysuser sys:sysOp.user){
-    			 sysuser orm=sysdao.search(sys.getUser_id());
-      	    	 if(orm!=null){
-                    sysdao.update(orm);
-      	    	 } 
+    			sysdao.update(sys); 
       	    	 
       	      } 
      	  }
