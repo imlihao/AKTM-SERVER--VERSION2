@@ -462,6 +462,7 @@ public class messageProcess {
         ldo.setLoaddo_id(uuid);
         ldo.setDiver_id(inc.driverid);
         ldo.setAutoid(inc.autoid);
+        ldo.setUTCTimeStamp(System.currentTimeMillis());
         ldo.setLoaddo_status(order_status.NOT_START);
         loadDao.save(ldo);
         loadDao.commit();
