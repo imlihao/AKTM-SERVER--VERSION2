@@ -43,6 +43,8 @@ namespace msgClass {
     loaddos: vo.loaddo[];
     tps: vo.transport[];
     cus: vo.customer[];
+
+    pdos:vo.pdo[];
   }
 
   export class invOp {
@@ -209,7 +211,7 @@ namespace vo {
     //    int good_identifier;
 
     //操作员
-    operator_id: string;
+    operator_id: number;
     UTCtimeStamp: number;
     UTCtimeStamp_str: string;
     
@@ -273,7 +275,27 @@ namespace vo {
     cost: number;
   }
 
+  export class pdo{
+    pdo_id: string;
 
+    //	//取货信息
+    //    int good_num;
+    //    String good_name;  
+    //    int good_identifier;
+
+    //操作员
+    operator_id: number;
+    UTCtimeStamp: number;
+
+    UTCtimeStamp_str: string;
+    
+    pdo_status: number;
+    co_status: number;
+
+    good_num:number;
+    good_name:string;
+
+  }
 }
 
 enum operator {

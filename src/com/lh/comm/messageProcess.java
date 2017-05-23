@@ -11,6 +11,7 @@ import com.lh.dao.dao_customer;
 import com.lh.dao.dao_invoice;
 import com.lh.dao.dao_loaddo;
 import com.lh.dao.dao_odo;
+import com.lh.dao.dao_pdo;
 import com.lh.dao.dao_sysuser;
 import com.lh.dao.dao_transport;
 import com.lh.daoImp.daoFactory;
@@ -23,6 +24,7 @@ import com.lh.vo.customer;
 import com.lh.vo.invoice;
 import com.lh.vo.loaddo;
 import com.lh.vo.odo;
+import com.lh.vo.pdo;
 import com.lh.vo.sysuser;
 import com.lh.vo.transport;
 /**
@@ -149,6 +151,10 @@ public class messageProcess {
 			dao_invoice indo=daoFactory.getInvoiceDao();
 			indo.search(mks.pk).setInv_status(inv_status.finish);	
 			indo.commit();
+	  }else if(mks.type==4){
+		  dao_pdo pd=daoFactory.getpdoDao();
+		  pd.search(mks.pk).setPdo_status(order_status.FINISH);
+		  pd.commit();
 	  }
 	  datarefreshall();	  
 	  return null;
@@ -225,6 +231,9 @@ public class messageProcess {
 		  scmsg.cus=cusd.searchAll();
 		  cusd.commit();
 		  
+		  dao_pdo pdod=daoFactory.getpdoDao();
+		  scmsg.pdos=pdod.searchAll();
+		  
 		  String dat=gs.toJson(scmsg);
 		  return dat;
     	  
@@ -261,7 +270,6 @@ public class messageProcess {
      	    	 
      	    	 dao_odo ododao=daoFactory.getodoDao();
      	    	 ododao.search(inv.getINV_ID()).setCo_status(common_status.DELETE);
-     	    	 ododao.commit();
      	    	 
      	   	     dao_transport dao2=daoFactory.gettransportDao();
      	    	 dao2.search(inv.getINV_ID()).setCo_status(common_status.DELETE);
@@ -272,7 +280,20 @@ public class messageProcess {
      	     	 dao3.search(inv.getINV_ID()).setCo_status(common_status.DELETE);
      	    	 dao3.commit();
      	    	 
+     	    	  dao_pdo pdd=daoFactory.getpdoDao();
+     			  pdo pd=new pdo();
+     			  pd.setPdo_id(inv.getINV_ID());
+     			  pd.setOperator_id(ododao.search(inv.getINV_ID()).getOperator_id());
+     			  pd.setPdo_status(order_status.ONGOING);
+     			  pd.setUTCtimeStamp(System.currentTimeMillis());
+     			  pd.setCo_status(common_status.NORMAL);
+     			  pd.setGood_name(inv.getGood_name());
+     			  pd.setGood_num(inv.getGood_num());
+     			  pdd.save(pd);
+     		
+     			  pdd.commit();
      	    	 
+     			  ododao.commit();
      	     } 
     	  }else if(invop.op==operator.update){
     		  for(invoice inv:invop.invs){
@@ -519,6 +540,8 @@ class SCupdateAll{
 	public List<loaddo> loaddos;
 	public List<transport> tps;
 	public List<customer> cus;
+	
+	public List<pdo> pdos;
 }
 
 class invOp{

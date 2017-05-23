@@ -106,7 +106,7 @@ function invoceOp(id,pos) {
      $("#receiver_addr2").val(inv.receiver_addr);
      $("#opid2").val(getSysNameById(inv.opid));
 
-    inv.opid = dataManager.instance.data.sysu.user_id;
+    inv.opid = dataManager.instance.sys.user_id;
     $("#invselectwop2").val(dataManager.instance.getOdoById(id).operator_id);
     $("#invselectdriver2").val(dataManager.instance.getloaddoByid(id).diver_id);
 
@@ -243,7 +243,7 @@ function invsaddpre() {
     $("#invselectwop").html(wopse);
 
 
-    $("#opid").val(dataManager.instance.data.sysu.name);
+    $("#opid").val(dataManager.instance.sys.name);
 }
 
 
@@ -263,7 +263,7 @@ function invAdd() {
     inv.receiver_phone = $("#receiver_phone").val();
     inv.receiver_addr = $("#receiver_addr").val();
 
-    inv.opid = dataManager.instance.data.sysu.user_id;
+    inv.opid = dataManager.instance.sys.user_id;
 
 
     var wopid = $("#invselectwop").val();
@@ -551,6 +551,88 @@ function updateTableOdo(odos) {
         ],
     });
 }
+
+
+/**
+ * 刷新odo
+ */
+function updateTablePdo(pdos) {
+    //测试数据
+    var dt = $("#dataTables-pdo");
+    if (!dt) {
+        console.log("没有找到表");
+        return;
+    }
+      dt.DataTable({
+        data: pdos,
+        destroy: "true",
+        responsive: true,
+        columns: [
+            {
+                "title": "单号",
+                "data": "pdo_id",
+                "width": "auto",
+
+            },
+            {
+                "title": "货物名称",
+                "data": "good_name",
+                "width": "auto",
+
+
+            },
+            {
+                "title": "数量",
+                "data": "good_num",
+                "width": "auto",
+
+            },
+            {
+                "title": "时间",
+                "data": "UTCtimeStamp",
+                "width": "auto",
+
+            },
+            {
+                "title": "订单状态",
+                "data": "pdo_status",
+                "width": "auto",
+
+            },
+            {
+                "data": null,
+                "width": "auto",
+            }],
+        columnDefs: [{
+            targets: 5,
+            render: function (data, type, row, meta) {
+                if(row.pdo_status!=order_status.ONGOING) return '<button  class="btn btn-success disabled"    >操作</button>';
+                return '<a type="button" class="btn btn-success "  data-toggle="modal" data-target="#odomodal"   onClick="pdoOp(' + "'" + row.pdo_id + "'" + ')" >操作</a>';
+            }
+        },
+        { "orderable": false, "targets": 1 },
+        ],
+    });
+}
+
+function pdoOp(id){ 
+   var html=new Array();
+    var pdo=dataManager.instance.getPdoById(id);
+    html.push(' <h3>单号：'+pdo.pdo_id+'</h3>  ');
+    html.push(' <h4>&nb sp</h4>  ');
+    html.push(' <h4>货物：'+pdo.good_name+'</h4>  ');
+    html.push(' <h4>数量：'+pdo.good_num+'</h4>  ');
+    html.push(' <h4>操作员：'+getSysNameById(pdo.operator_id)+'</h4>  ');
+    html.push(' <h4>时间：'+pdo.UTCtimeStamp+'</h4>  ');
+    $("#odomodal_body").html(html);
+    temp_pdoid=pdo.pdo_id; 
+}
+var temp_pdoid;
+
+function pdomark(){
+   marksolve(od_type.pdo,temp_pdoid);
+}
+
 
 
 function odoOp(id){ 
@@ -851,6 +933,6 @@ function drowGrid2(){
 
 
 function showname(){    
-        $("#sysu_name").text("用户:" + dataManager.instance.dataMian.sysu.name + "("+getSysEnByType(dataManager.instance.dataMian.sysu.roletype)+")");
+        $("#sysu_name").text("用户:" + dataManager.instance.sys.name + "("+getSysEnByType(dataManager.instance.sys.roletype)+")");
         console.error( $("#sysu_name").val());
 }

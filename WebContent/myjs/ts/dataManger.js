@@ -20,7 +20,11 @@ var dataManager = (function () {
             return this.dataMian;
         },
         set: function (dat) {
+            if (!this.dataMian) {
+                this.sys = dat.sysu;
+            }
             this.dataMian = dat;
+            console.error('pdo:', this.dataMian.pdos);
             this.a1 = 0;
             this.a2 = 0;
             this.a3 = 0;
@@ -45,7 +49,7 @@ var dataManager = (function () {
                 }
             }
             if (this.dataMian.loaddos) {
-                for (var i = 0; i < this.dataMian.odos.length; i++) {
+                for (var i = 0; i < this.dataMian.loaddos.length; i++) {
                     this.dataMian.loaddos[i].loaddo_status_syr = getOrderStatusStr(od_type.loaddo, this.dataMian.loaddos[i].loaddo_status);
                     this.dataMian.loaddos[i].UTCTimeStamp_str = new Date(this.dataMian.loaddos[i].UTCTimeStamp).toLocaleString();
                     this.dataMian.loaddos[i].good_name = this.getInvByid(this.dataMian.loaddos[i].loaddo_id).good_name;
@@ -54,7 +58,7 @@ var dataManager = (function () {
                 }
             }
             if (this.dataMian.tps) {
-                for (var i = 0; i < this.dataMian.odos.length; i++) {
+                for (var i = 0; i < this.dataMian.tps.length; i++) {
                     this.dataMian.tps[i].transport_status_str = getOrderStatusStr(od_type.tps, this.dataMian.tps[i].transport_status);
                     this.dataMian.tps[i].UTCTimeStamp_str = new Date(this.dataMian.tps[i].UTCTimeStamp).toLocaleString();
                     this.dataMian.tps[i].good_name = this.getInvByid(this.dataMian.tps[i].transport_id).good_name;
@@ -77,17 +81,40 @@ var dataManager = (function () {
         configurable: true
     });
     dataManager.prototype.showall = function () {
+        var _this = this;
         if (!this.data) {
             console.error("数据dataMian==null");
         }
         updateTableInv(this.dataMian.invs);
         updateTableCus(this.dataMian.cus);
         showsysuser(this.getSysByType(this.systype));
-        updateTableOdo(this.dataMian.odos);
-        updateTableloaddo(this.dataMian.loaddos);
-        updateTableTps(this.dataMian.tps);
+        var cus = this.dataMian.odos;
+        if (this.sys.roletype == roletype.operator_Warehouse) {
+            cus = this.dataMian.odos.filter(function (value) {
+                if (value.operator_id == _this.sys.user_id)
+                    return value;
+            });
+        }
+        updateTableOdo(cus);
+        var load = this.dataMian.loaddos;
+        if (this.sys.roletype == roletype.diver) {
+            load = this.dataMian.loaddos.filter(function (value) {
+                if (value.diver_id == _this.sys.user_id)
+                    return value;
+            });
+        }
+        updateTableloaddo(load);
+        var tps = this.dataMian.tps;
+        if (this.sys.roletype == roletype.diver) {
+            tps = this.dataMian.tps.filter(function (value) {
+                if (value.diver_id == _this.sys.user_id)
+                    return value;
+            });
+        }
+        updateTableTps(tps);
         drowGrid1(this.a1, this.a2, this.a3);
         drowGrid2();
+        updateTablePdo(this.dataMian.pdos);
     };
     dataManager.prototype.getCusByid = function (id) {
         id = Number(id);
@@ -129,6 +156,13 @@ var dataManager = (function () {
     dataManager.prototype.getOdoById = function (id) {
         if (this.dataMian && this.dataMian.odos) {
             return this.dataMian.odos.find(function (value) { return value.odo_id == id; });
+        }
+        ;
+        return null;
+    };
+    dataManager.prototype.getPdoById = function (id) {
+        if (this.dataMian && this.dataMian.pdos) {
+            return this.dataMian.pdos.find(function (value) { return value.pdo_id == id; });
         }
         ;
         return null;
@@ -181,6 +215,7 @@ var od_type;
     od_type[od_type["odo"] = 1] = "odo";
     od_type[od_type["tps"] = 2] = "tps";
     od_type[od_type["loaddo"] = 3] = "loaddo";
+    od_type[od_type["pdo"] = 4] = "pdo";
 })(od_type || (od_type = {}));
 function getOrderStatusStr(otype, ost) {
     if (ost == order_status.ONGOING) {
@@ -196,7 +231,7 @@ function getOrderStatusStr(otype, ost) {
     }
     switch (ost) {
         case order_status.NOT_START:
-            return "0-未开始";
+            return "3-未开始";
         case order_status.FINISH:
             return "2-已完成";
     }

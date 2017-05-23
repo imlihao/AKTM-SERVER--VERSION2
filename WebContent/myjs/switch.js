@@ -482,6 +482,85 @@ function switch2from() {
     dataManager.instance.showall();
 }
 
+
+function switch2pdo(){
+    
+  if (document.getElementById("dataTables-pdo")) {
+        console.error("重复加载");
+        return;
+    }
+
+    var head=getHeadHtml("入库管理");
+    var body=[' <div class="row" >',
+'                <div class="col-lg-12">',
+'                    <div class="panel panel-default">',
+'                        <div class="panel-heading">',
+'                            入库单',
+'                        </div>',
+'                        <!-- /.panel-heading -->',
+'                        <div class="panel-body">',
+'                            <table   class="table table-striped table-bordered table-hover" width="100%" id="dataTables-pdo">',
+'                                <thead>',
+'                                    <tr>',
+'                                        <th>单号</th>',
+'                                        <th>货物名称</th>',
+'                                        <th>数量</th>',
+'                                        <th>时间</th>',
+'                                        <th>订单状态</th> ',
+'                                        <th>操作</th>                                        ',
+'                                    </tr>',
+'                                </thead>',
+'                               ',
+'                                <tbody>',
+'                                </tbody>',
+'                                   ',
+'                            </table>',
+'                            <!-- /.table-responsive -->',
+'               ',
+'                        </div>',
+'                        <!-- /.panel-body -->',
+'                    </div>',
+'                    <!-- /.panel -->',
+'                </div>',
+'                <!-- /.col-lg-12 -->',
+'            </div>',
+'            <!-- /.row -->',
+'            ',
+'            ',
+'            <div  class="row">',
+'                  <!-- Modal -->',
+'                            <div class="modal fade" id="odomodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">',
+'                                <div class="modal-dialog">',
+'                                    <div class="modal-content">',
+'                                        <div class="modal-header">',
+'                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>',
+'                                            <h4 class="modal-title" id="myModalLabel">入库单</h4>',
+'                                        </div>',
+'                                        <div class="modal-body" id="odomodal_body" >',
+'                                            <h4>单号：dddddd3232</h4>                       ',
+'                                            <pre>单号：dddddd3232</pre>',
+'                                            <pre>单号：dddddd3232</pre>',
+'                                            <pre>单号：dddddd3232</pre>',
+'                                        </div>',
+'                                        <div class="modal-footer">',
+'                                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>',
+'                                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="pdomark()">标记为已完成</button>',
+'                                        </div>',
+'                                    </div>',
+'                                    <!-- /.modal-content -->',
+'                                </div>',
+'                                <!-- /.modal-dialog -->',
+'                            </div>',
+'                            <!-- /.modal -->',
+'            </div>'].join("");
+      var base = $("#page-wrapper");
+      base.html(head);
+      base.append(body);
+      $("#chukuguanli").append(getDismisPanel(2,1,2));
+       $("#chukuguanli").append(getGonggaoPanel());
+      dataManager.instance.showall();
+}
+
 //切换到出库单
 function switch2odo() {
     if (document.getElementById("dataTables-odo")) {
@@ -901,8 +980,8 @@ function user3(){
 function powerContrl() {
    
     console.error("权限控制");
-    if(dataManager.instance.data.sysu){
-       sy=dataManager.instance.data.sysu.roletype;
+    if(dataManager.instance.sys){
+       sy=dataManager.instance.sys.roletype;
        if(sy==roletype.diver){
            $("#2order").hide();
            $("#2odo").hide();
@@ -973,8 +1052,13 @@ function addevent() {
     } else {
         console.error("没有客户中心权限");
     }
-
-
+ 
+   var tar = document.getElementById("2pdo");
+    if (tar) {
+        tar.addEventListener("click", switch2pdo, true);
+    } else {
+        console.error("没有pdo权限");
+    }
     // //用户权限，分别处理
     // var tar = document.getElementById("2sysuserdirver");
     // if (tar) {

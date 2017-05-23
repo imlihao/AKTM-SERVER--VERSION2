@@ -12,9 +12,14 @@ class dataManager {
     private a1 = 0;
     private a2 = 0;
     private a3 = 0;
-
+    public sys:vo.sysuer;
     public set data(dat: msgClass.SCupdateAll) {
+        if(!this.dataMian){
+            this.sys=dat.sysu;
+        }
+
         this.dataMian = dat;
+        console.error('pdo:',this.dataMian.pdos);
         this.a1 = 0;
         this.a2 = 0;
         this.a3 = 0;
@@ -40,7 +45,7 @@ class dataManager {
         }
 
         if (this.dataMian.loaddos) {
-            for (var i = 0; i < this.dataMian.odos.length; i++) {
+            for (var i = 0; i < this.dataMian.loaddos.length; i++) {
                 this.dataMian.loaddos[i].loaddo_status_syr = getOrderStatusStr(od_type.loaddo, this.dataMian.loaddos[i].loaddo_status);
                 this.dataMian.loaddos[i].UTCTimeStamp_str = new Date(this.dataMian.loaddos[i].UTCTimeStamp).toLocaleString();
                 this.dataMian.loaddos[i].good_name = this.getInvByid(this.dataMian.loaddos[i].loaddo_id).good_name;
@@ -51,7 +56,7 @@ class dataManager {
         }
 
         if (this.dataMian.tps) {
-            for (var i = 0; i < this.dataMian.odos.length; i++) {
+            for (var i = 0; i < this.dataMian.tps.length; i++) {
                 this.dataMian.tps[i].transport_status_str = getOrderStatusStr(od_type.tps, this.dataMian.tps[i].transport_status);
                 this.dataMian.tps[i].UTCTimeStamp_str = new Date(this.dataMian.tps[i].UTCTimeStamp).toLocaleString();
                 this.dataMian.tps[i].good_name = this.getInvByid(this.dataMian.tps[i].transport_id).good_name;
@@ -84,15 +89,48 @@ class dataManager {
         }
         updateTableInv(this.dataMian.invs);
         updateTableCus(this.dataMian.cus);
-
+     
+     
         showsysuser(this.getSysByType(this.systype));
+      
 
-        updateTableOdo(this.dataMian.odos);
-        updateTableloaddo(this.dataMian.loaddos);
+       
 
-        updateTableTps(this.dataMian.tps);
+
+      
+        var cus=this.dataMian.odos;
+        if(this.sys.roletype==roletype.operator_Warehouse){
+             cus=this.dataMian.odos.filter((value:vo.odo)=>{
+                 if(value.operator_id==this.sys.user_id)
+                  return value;
+             });
+        }
+        updateTableOdo(cus);
+
+        var load=this.dataMian.loaddos;
+        if(this.sys.roletype==roletype.diver){
+             load=this.dataMian.loaddos.filter((value:vo.loaddo)=>{
+                 if(value.diver_id==this.sys.user_id)
+                  return value;
+             });
+        }
+        updateTableloaddo(load);
+
+
+        var tps=this.dataMian.tps;
+        if(this.sys.roletype==roletype.diver){
+             tps=this.dataMian.tps.filter((value:vo.transport)=>{
+                 if(value.diver_id==this.sys.user_id)
+                  return value;
+             });
+        }
+        updateTableTps(tps);
         drowGrid1(this.a1, this.a2, this.a3);
         drowGrid2();
+
+
+
+        updateTablePdo(this.dataMian.pdos);
     }
     public systype: number;
 
@@ -143,6 +181,12 @@ class dataManager {
     }
 
 
+    public getPdoById(id: string): vo.pdo {
+        if (this.dataMian && this.dataMian.pdos) {
+            return this.dataMian.pdos.find((value: vo.pdo) => { return value.pdo_id == id });
+        };
+        return null;
+    }
     public getSysByType(type: roletype): vo.sysuer[] {
         var redata = new Array<vo.sysuer>();
 
@@ -189,7 +233,8 @@ class dataManager {
 enum od_type {
     odo = 1,
     tps = 2,
-    loaddo = 3
+    loaddo = 3,
+    pdo=4
 
 }
 

@@ -36,5 +36,6 @@
 	    
 	    <mapping class="com.lh.vo.customer"/>
 	    <mapping class="com.lh.vo.sysuser"/>
+	     <mapping class="com.lh.vo.pdo"/>
 	</session-factory>
 </hibernate-configuration>

@@ -178,6 +178,12 @@ var vo;
         return transport;
     }());
     vo.transport = transport;
+    var pdo = (function () {
+        function pdo() {
+        }
+        return pdo;
+    }());
+    vo.pdo = pdo;
 })(vo || (vo = {}));
 var operator;
 (function (operator) {

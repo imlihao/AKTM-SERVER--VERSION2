@@ -4,6 +4,7 @@ import com.lh.dao.dao_customer;
 import com.lh.dao.dao_invoice;
 import com.lh.dao.dao_loaddo;
 import com.lh.dao.dao_odo;
+import com.lh.dao.dao_pdo;
 import com.lh.dao.dao_sysuser;
 import com.lh.dao.dao_transport;
 
@@ -26,5 +27,9 @@ public class daoFactory {
    }
    public static dao_transport gettransportDao(){
 	   return new transportDaoImp();
+   }
+   
+   public static dao_pdo getpdoDao(){
+	   return new pdoDaoImp();
    }
 }
